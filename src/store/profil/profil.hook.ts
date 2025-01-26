@@ -2,18 +2,18 @@ import { useAtom } from "jotai";
 import { profilAtom, ProfilState } from "./profil.store";
 import { AxiosError } from "axios";
 import { axiosInstance } from "@/utils/axios.config";
-import useUser from "../user/user.hook";
-import useAuth from "../auth/auth.hook";
+import { useAuth } from "../auth.store";
+import { useUser } from "../user.store";
 
 export default function useProfil() {
   const [state, profilDispatch] = useAtom(profilAtom);
   const { user } = useUser();
   const { getToken } = useAuth();
-  const { token } = useAuth();
+  const token = getToken();
 
   const getPicture = async (id?: string) => {
     profilDispatch({ payload: { status: "loading" } });
-    const token = getToken();
+
     try {
       const responseGetPicture = await axiosInstance.get(
         `/profils/${state.profil?.id || id}/avatar`,
@@ -54,15 +54,17 @@ export default function useProfil() {
 
   const getProfil = async () => {
     profilDispatch({ payload: { status: "loading" } });
-    const token = getToken();
 
     try {
-      if (user?.id) {
-        const response = await axiosInstance.get("/profils/user/" + user.id, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      if ((user as any).id) {
+        const response = await axiosInstance.get(
+          "/profils/user/" + (user as any).id,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         const profil: ProfilState = {
           profil: {
@@ -94,9 +96,9 @@ export default function useProfil() {
 
   const updatePicture = async (formData: any, cb?: Function) => {
     profilDispatch({ payload: { status: "loading" } });
-    const token = getToken();
+
     try {
-      const response = await axiosInstance.post(
+      await axiosInstance.post(
         `/profils/${state.profil?.id}/upload`,
         formData,
         {
@@ -165,7 +167,7 @@ export default function useProfil() {
 
   const deleteAvatar = async (cb?: Function) => {
     profilDispatch({ payload: { status: "loading" } });
-    const token = getToken();
+
     try {
       const response = await axiosInstance.delete(
         `/profils/${state.profil?.id}/avatar`,

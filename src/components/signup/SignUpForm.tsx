@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import useAuth from "@/store/auth/auth.hook";
 import ButtonProgres from "../button/button.progres";
+import { useAuth } from "@/store/auth.store";
+import { useRouter } from "next/navigation";
 
 const validationSchema = yup.object({
   username: yup.string().required("Username is required"),
@@ -16,7 +17,8 @@ const validationSchema = yup.object({
 });
 
 export default function SignUpForm() {
-  const { register, status } = useAuth();
+  const { register, loading } = useAuth();
+  const router = useRouter();
   // Formik
   const formik = useFormik({
     initialValues: {
@@ -28,10 +30,10 @@ export default function SignUpForm() {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      register({ ...values });
-      if (status === "succeeded") {
+      register({ ...values }, () => {
         formik.resetForm();
-      }
+        router.push("/auth/login");
+      });
     },
   });
 
@@ -143,7 +145,7 @@ export default function SignUpForm() {
           label="Sign Up"
           model="success"
           type="submit"
-          open={status === "loading"}
+          open={loading}
         />
       </div>
 

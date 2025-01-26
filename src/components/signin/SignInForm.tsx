@@ -2,10 +2,9 @@
 import Link from "next/link";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import useAuth from "@/store/auth/auth.hook";
 import { useRouter } from "next/navigation";
 import ButtonProgres from "../button/button.progres";
-import { useEffect } from "react";
+import { useAuth } from "@/store/auth.store";
 
 const validationSchema = yup.object({
   username: yup.string().required("Username is required"),
@@ -13,9 +12,8 @@ const validationSchema = yup.object({
 });
 
 export default function SignInForm() {
-  const { login, status } = useAuth();
+  const { login, loading } = useAuth();
   const router = useRouter();
-  // Formik
   const formik = useFormik({
     initialValues: {
       username: "",
@@ -23,13 +21,9 @@ export default function SignInForm() {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      login(values.username, values.password);
+      login(values.username, values.password, () => router.push("/"));
     },
   });
-
-  useEffect(() => {
-    if (status === "succeeded") router.push("/");
-  }, [status]);
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -76,14 +70,14 @@ export default function SignInForm() {
           label="Sign In"
           model="success"
           type="submit"
-          open={status === "loading"}
+          open={loading}
         />
       </div>
 
       <div className="mt-6 text-center">
         <p>
           Don’t have any account?{" "}
-          <Link href="/auth/signup" className="text-primary">
+          <Link href="/auth/register" className="text-primary">
             Sign Up
           </Link>
         </p>

@@ -5,6 +5,7 @@ interface ButtonProps {
   model: "success" | "warning" | "attantion"; // Representing theme
   open: boolean; // Handle progress when open, text on button set to progress component
   label: string;
+  onclick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const buttonStyles = {
@@ -18,11 +19,13 @@ export default function ButtonProgres({
   model,
   open,
   label,
+  onclick = () => {},
 }: ButtonProps) {
   return (
     <button
       type={type}
-      className={`flex w-full items-center justify-center rounded-lg px-4 py-2 text-white ${buttonStyles[model]}`}
+      className={`flex w-full items-center justify-center rounded-lg px-4 py-2 font-semibold text-white ${buttonStyles[model]}`}
+      onClick={onclick}
     >
       {open ? (
         <svg

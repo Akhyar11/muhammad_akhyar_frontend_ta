@@ -37,6 +37,7 @@ function ImageFormComp() {
   const [popupStatus, setPopupStatus] = useState<"success" | "error">(
     "success",
   );
+
   const [popupMessage, setPopupMessage] = useState("");
 
   // Fungsi untuk memunculkan popup
@@ -77,7 +78,6 @@ function ImageFormComp() {
 
   useEffect(() => {
     if (status === "failed") {
-      console.log({ error });
       triggerPopup("error", error);
     }
   }, [error, status]);

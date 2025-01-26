@@ -1,17 +1,11 @@
 "use client";
-import useAuth from "@/store/auth/auth.hook";
 import SignInForm from "./SignInForm";
 import AlertPopup from "../alerts/alerts.popup";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/store/auth.store";
 
 export default function SignInComponent() {
-  const { status, error } = useAuth();
-  const [alertOpen, setAlertOpen] = useState(false);
+  const { error, resetError } = useAuth();
 
-  useEffect(() => {
-    if (status === "failed") setAlertOpen(true);
-    if (status !== "failed") setAlertOpen(false);
-  }, [status]);
   return (
     <>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -159,12 +153,15 @@ export default function SignInComponent() {
         </div>
       </div>
 
-      <AlertPopup
-        open={alertOpen}
-        type="warning"
-        mainInfo="Warning"
-        desc={error}
-      />
+      {error && (
+        <AlertPopup
+          open={true}
+          type="warning"
+          mainInfo="Warning"
+          desc={error}
+          onClose={resetError}
+        />
+      )}
     </>
   );
 }

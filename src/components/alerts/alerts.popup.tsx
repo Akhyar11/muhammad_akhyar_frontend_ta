@@ -5,6 +5,7 @@ interface AlertsProps {
   open: boolean;
   mainInfo: string;
   desc?: string;
+  onClose?: Function;
 }
 
 export default function AlertPopup({
@@ -12,6 +13,7 @@ export default function AlertPopup({
   mainInfo,
   desc,
   open,
+  onClose = () => {},
 }: AlertsProps) {
   // Create a alert popup widh tailwind-css and use 3 type into AlertsPorps, and please add animation when alert is active
   const alertStyles = {
@@ -27,6 +29,7 @@ export default function AlertPopup({
     if (open) {
       const timer = setTimeout(() => {
         setIsVisible(false);
+        onClose();
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -42,6 +45,4 @@ export default function AlertPopup({
       {desc && <p>{desc}</p>}
     </div>
   );
-
-  return <></>;
 }
