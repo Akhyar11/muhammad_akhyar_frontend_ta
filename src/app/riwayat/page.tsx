@@ -1,19 +1,16 @@
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import DashboardComponent from "@/components/Dashboard";
+import RiwayatComponent from "@/components/Riwayat";
 
 export const metadata: Metadata = {
-  title:
-    "BMI Sistem - Dashboard",
+  title: "BMI Sistem - Riwayat",
   description: "This is Next.js Home for TailAdmin Dashboard Template",
 };
 
-export default function Home() {
+export default function Page() {
   return (
-    <>
-      <DefaultLayout>
-        <DashboardComponent />
-      </DefaultLayout>
-    </>
+    <DefaultLayout>
+      <RiwayatComponent />
+    </DefaultLayout>
   );
 }

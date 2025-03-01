@@ -4,6 +4,7 @@ import Table, { ColumnConfig } from "../Tables/Table";
 import Breadcrumb from "../Breadcrumbs/Breadcrumb";
 import ButtonProgres from "../button/button.progres";
 import { useAnthropometry } from "@/store/anthropometry.store";
+import BMIIntelligence from "../BMIIntelligence";
 
 const DashboardComponent: React.FC = () => {
   const { loading, fetchAnthropometry, data } = useAnthropometry();
@@ -71,7 +72,7 @@ const DashboardComponent: React.FC = () => {
 
   return (
     <>
-      <div className="mt-4 flex min-h-screen flex-col gap-4">
+      <div className="mt-4 flex min-h-screen flex-col gap-6">
         <div className="flex justify-between">
           <Breadcrumb pageName="DATA BMI" />
 
@@ -86,6 +87,7 @@ const DashboardComponent: React.FC = () => {
           </div>
         </div>
         <Table columns={colomns} data={data} />
+        <BMIIntelligence />
       </div>
     </>
   );

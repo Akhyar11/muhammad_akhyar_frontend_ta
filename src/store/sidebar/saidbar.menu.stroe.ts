@@ -14,6 +14,14 @@ export const initialState: MenuItems[] = [
     route: "/",
   },
   {
+    label: "BMI Intelligence (BETA)",
+    route: "/bmiintelligence",
+  },
+  {
+    label: "Riwayat",
+    route: "/riwayat",
+  },
+  {
     label: "Settings",
     route: "/settings",
   },

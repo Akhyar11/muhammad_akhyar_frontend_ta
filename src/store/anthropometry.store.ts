@@ -147,11 +147,12 @@ export const useAnthropometry = () => {
     dispatch({ type: "CLEAR_DATA" });
   };
 
-  const fetchAnthropometry = async () => {
+  const fetchAnthropometry = async (params: any = {}) => {
     setLoading("read", true);
     try {
       const response = await axiosInstance.get("/antropomerty/list/" + id, {
         headers: { Authorization: `Bearer ${token}` },
+        params,
       });
       setData(response.data.data);
     } catch (error: any) {

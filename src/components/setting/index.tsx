@@ -10,6 +10,7 @@ import { useFormik } from "formik";
 import PopupStatus from "../alerts/popupStatus";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/store/user.store";
+import QRCodeGenerator from "./qrCode";
 
 interface PersonalInformation {
   nama_lengkap: string;
@@ -201,7 +202,7 @@ export default function SettingComponent() {
 
   return (
     <>
-      <div className="grid grid-cols-5 gap-8">
+      <div className="mt-8 grid grid-cols-5 gap-8">
         <div className="col-span-5 xl:col-span-3">
           <div className="col-span-5 mb-8 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -499,7 +500,10 @@ export default function SettingComponent() {
           </div>
         </div>
 
-        <ImageForm />
+        <div className="col-span-5 xl:col-span-2">
+          <ImageForm />
+          <QRCodeGenerator />
+        </div>
       </div>
 
       {/* {showPopup && (

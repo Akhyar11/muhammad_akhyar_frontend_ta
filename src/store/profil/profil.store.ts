@@ -5,6 +5,7 @@ export interface ProfilState {
     id: string;
     nama_lengkap: string;
     avatarUrl: string;
+    summary: string;
   };
   error?: any;
   status?: "idle" | "loading" | "succeeded" | "failed";
@@ -19,6 +20,7 @@ const initialState: ProfilState = {
     id: "",
     avatarUrl: "",
     nama_lengkap: "",
+    summary: "",
   },
 
   error: undefined,

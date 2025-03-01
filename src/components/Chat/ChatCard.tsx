@@ -1,113 +1,176 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Chat } from "@/types/chat";
+"use client";
 
-const chatData: Chat[] = [
-  {
-    avatar: "/images/user/user-01.png",
-    name: "Devid Heilo",
-    text: "How are you?",
-    time: 12,
-    textCount: 3,
-    dot: 3,
-  },
-  {
-    avatar: "/images/user/user-02.png",
-    name: "Henry Fisher",
-    text: "Waiting for you!",
-    time: 12,
-    textCount: 0,
-    dot: 1,
-  },
-  {
-    avatar: "/images/user/user-04.png",
-    name: "Jhon Doe",
-    text: "What's up?",
-    time: 32,
-    textCount: 0,
-    dot: 3,
-  },
-  {
-    avatar: "/images/user/user-05.png",
-    name: "Jane Doe",
-    text: "Great",
-    time: 32,
-    textCount: 2,
-    dot: 6,
-  },
-  {
-    avatar: "/images/user/user-01.png",
-    name: "Jhon Doe",
-    text: "How are you?",
-    time: 32,
-    textCount: 0,
-    dot: 3,
-  },
-  {
-    avatar: "/images/user/user-03.png",
-    name: "Jhon Doe",
-    text: "How are you?",
-    time: 32,
-    textCount: 3,
-    dot: 6,
-  },
-];
+import { useAuth } from "@/store/auth.store";
+import { useUser } from "@/store/user.store";
+import { axiosInstance } from "@/utils/axios.config";
+import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+
+const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
+  return (
+    <div
+      className={`flex items-start ${user === "user" ? "justify-end" : "justify-start"} gap-3`}
+    >
+      {user === "AI" && (
+        <div className="relative h-10 w-10 rounded-full">
+          <Image
+            width={40}
+            height={40}
+            src="/images/user/user-01.png"
+            alt="AI"
+            className="rounded-full"
+          />
+        </div>
+      )}
+
+      <div
+        className={`max-w-[75%] rounded-2xl ${user === "user" ? "rounded-tr-none bg-primary" : "rounded-tl-none bg-gray-2 dark:bg-meta-4"} p-4`}
+      >
+        <p
+          className={`text-sm ${user === "user" ? "text-white" : "text-black dark:text-white"}`}
+        >
+          <ReactMarkdown>{message}</ReactMarkdown>
+        </p>
+      </div>
+
+      {user === "user" && (
+        <div className="relative h-10 w-10 rounded-full">
+          <Image
+            width={40}
+            height={40}
+            src="/images/user/user-02.png"
+            alt="User"
+            className="rounded-full"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ChatCard = () => {
+  const [messages, setMessages] = useState("");
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [animation, setAnimation] = useState<ScrollBehavior>("instant");
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Tambahkan useRef
+
+  const { getToken } = useAuth();
+  const { user, me, loading } = useUser();
+  const token = getToken();
+
+  const getMessage = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/convertation?userId=${(user as any).id}&limit=9999`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const chat: any = [];
+      response.data.forEach((data: any) => {
+        chat.push({ message: data.userMessage, user: "user" });
+        chat.push({ message: data.AIMessage, user: "AI" });
+      });
+
+      setChatMessages(chat);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const chat: any = [];
+    try {
+      setAnimation("smooth");
+      chat.push({ message: messages, user: "user" });
+      setChatMessages([...chatMessages, { message: messages, user: "user" }]);
+      setMessages("");
+
+      const response = await axiosInstance.post(
+        "/convertation",
+        { userMessage: messages, userId: (user as any).id },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      chat.push({ message: response.data.AIMessage, user: "AI" });
+      await getMessage();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Gunakan useEffect untuk scroll ke bawah saat chatMessages berubah
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: animation });
+  }, [chatMessages]);
+
+  useEffect(() => {
+    me();
+  }, []);
+
+  useEffect(() => {
+    if ((user as any).id) {
+      setAnimation("instant");
+      getMessage();
+    }
+  }, [(user as any).id]);
+
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
       <h4 className="mb-6 px-7.5 text-xl font-semibold text-black dark:text-white">
-        Chats
+        BMI Intelligence
       </h4>
 
-      <div>
-        {chatData.map((chat, key) => (
-          <Link
-            href="/"
-            className="flex items-center gap-5 px-7.5 py-3 hover:bg-gray-3 dark:hover:bg-meta-4"
-            key={key}
-          >
-            <div className="relative h-14 w-14 rounded-full">
-              <Image
-                width={56}
-                height={56}
-                src={chat.avatar}
-                alt="User"
-                style={{
-                  width: "auto",
-                  height: "auto",
-                }}
-              />
-              <span
-                className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
-                  chat.dot === 6 ? "bg-meta-6" : `bg-meta-${chat.dot}`
-                } `}
-              ></span>
-            </div>
+      <div className="flex h-[500px] flex-col">
+        <div className="flex-1 overflow-y-auto px-7.5">
+          <div className="space-y-4">
+            {chatMessages.map((chat, index) => (
+              <Chat key={index} message={chat.message} user={chat.user} />
+            ))}
+            {/* Elemen dummy untuk scroll ke bawah */}
+            <div ref={chatEndRef}></div>
+          </div>
+        </div>
 
-            <div className="flex flex-1 items-center justify-between">
-              <div>
-                <h5 className="font-medium text-black dark:text-white">
-                  {chat.name}
-                </h5>
-                <p>
-                  <span className="text-sm text-black dark:text-white">
-                    {chat.text}
-                  </span>
-                  <span className="text-xs"> . {chat.time} min</span>
-                </p>
-              </div>
-              {chat.textCount !== 0 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
-                  <span className="text-sm font-medium text-white">
-                    {" "}
-                    {chat.textCount}
-                  </span>
-                </div>
-              )}
-            </div>
-          </Link>
-        ))}
+        {/* Chat Input */}
+        <div className="mt-auto border-t border-stroke px-7.5 pt-4 dark:border-strokedark">
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Ketik pesan Anda..."
+              className="w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
+              value={messages}
+              onKeyDown={(e) =>
+                loading.read && e.key === "Enter" && handleSendMessage()
+              }
+              onChange={(e) => setMessages(e.target.value)}
+            />
+            <button
+              onClick={() => handleSendMessage()}
+              disabled={!loading.read}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white hover:bg-opacity-90"
+            >
+              <svg
+                className="fill-current"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.8125 2.1875L2.1875 9.375L8.125 11.875M17.8125 2.1875L11.875 17.8125L8.125 11.875M17.8125 2.1875L8.125 11.875"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

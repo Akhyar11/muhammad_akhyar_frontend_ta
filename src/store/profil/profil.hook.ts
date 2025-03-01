@@ -33,6 +33,7 @@ export default function useProfil() {
             avatarUrl: gambar,
             id: state.profil?.id || (id as string),
             nama_lengkap: state.profil?.nama_lengkap as string,
+            summary: state.profil?.summary as string,
           },
 
           status: "succeeded",
@@ -71,6 +72,7 @@ export default function useProfil() {
             avatarUrl: "",
             id: response.data.id,
             nama_lengkap: response.data.nama_lengkap,
+            summary: response.data.summary,
           },
 
           status: "succeeded",

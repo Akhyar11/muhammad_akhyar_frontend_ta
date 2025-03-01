@@ -12,9 +12,10 @@ interface TableProps {
   columns: ColumnConfig[];
   data: { [key: string]: any }[];
   itemsPerPage?: number;
+  children?: React.ReactNode;
 }
 
-const Table = ({ columns, data, itemsPerPage = 10 }: TableProps) => {
+const Table = ({ columns, data, itemsPerPage = 10, children=<></> }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -67,7 +68,8 @@ const Table = ({ columns, data, itemsPerPage = 10 }: TableProps) => {
   };
 
   return (
-    <div className="rounded-lg border border-stroke bg-white px-6 pb-4 pt-6 shadow-md dark:border-strokedark dark:bg-boxdark sm:px-8">
+    <div className="rounded-lg border border-stroke bg-white p-6 shadow-md dark:border-strokedark dark:bg-boxdark sm:px-8">
+      {children}
       <table className="min-w-full overflow-x-auto">
         <thead className="bg-gray-100 text-left font-semibold uppercase text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
           <tr>
