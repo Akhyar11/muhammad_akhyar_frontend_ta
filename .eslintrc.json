@@ -1,3 +1,6 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "roles": {
+    "react-hooks/exhaustive-deps": "off"
+  }
 }

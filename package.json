@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@mui/icons-material": "^6.2.1",
-    "apexcharts": "^3.45.2",
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
     "flatpickr": "^4.6.13",

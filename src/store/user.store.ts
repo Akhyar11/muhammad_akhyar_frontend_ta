@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/utils/axios.config";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { atomWithReducer } from "jotai/utils";
 import { useAuth } from "./auth.store";
 
