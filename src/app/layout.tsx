@@ -16,7 +16,7 @@ export default function RootLayout({
 
   useEffect(() => {
     me();
-  }, [me]);
+  }, []);
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
