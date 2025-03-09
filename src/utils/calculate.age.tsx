@@ -21,3 +21,21 @@ export default function calculateDetailedAge(birthDate: string) {
 
   return `${years} tahun ${months} bulan ${days} hari`; // Mengembalikan umur dalam format yang diinginkan
 }
+
+// Calculate age from date at format {age: number, months: number}
+export function calculateAge(birthDate: Date) {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+
+  if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+    months += 12;
+  }
+
+  if (today.getDate() < birthDate.getDate()) {
+    months--;
+  }
+
+  return { age, months };
+}
