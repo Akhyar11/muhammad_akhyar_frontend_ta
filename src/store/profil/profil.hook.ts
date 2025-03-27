@@ -11,48 +11,6 @@ export default function useProfil() {
   const { getToken } = useAuth();
   const token = getToken();
 
-  const getPicture = async (id?: string) => {
-    profilDispatch({ payload: { status: "loading" } });
-
-    try {
-      const responseGetPicture = await axiosInstance.get(
-        `/profils/${state.profil?.id || id}/avatar`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          responseType: "blob",
-        },
-      );
-
-      const gambar = URL.createObjectURL(responseGetPicture.data);
-
-      if (state.profil) {
-        const profil: ProfilState = {
-          profil: {
-            avatarUrl: gambar,
-            id: state.profil?.id || (id as string),
-            nama_lengkap: state.profil?.nama_lengkap as string,
-            summary: state.profil?.summary as string,
-          },
-
-          status: "succeeded",
-        };
-        profilDispatch({ payload: profil });
-      }
-    } catch (error) {
-      console.log(error);
-      if (error instanceof AxiosError) {
-        profilDispatch({
-          payload: {
-            error: "Can't get picture user",
-            status: "failed",
-          },
-        });
-      }
-    }
-  };
-
   const getProfil = async () => {
     profilDispatch({ payload: { status: "loading" } });
 
@@ -79,7 +37,7 @@ export default function useProfil() {
         };
 
         profilDispatch({ payload: profil });
-        getPicture(response.data.id);
+        // getPicture(response.data.id);
       }
     } catch (error) {
       console.log(error);
@@ -111,7 +69,7 @@ export default function useProfil() {
         },
       });
 
-      getPicture();
+      // getPicture();
 
       if (cb) cb();
     } catch (error) {
