@@ -22,6 +22,39 @@ const DateKMSChart = ({
     return Math.max(0, months); // Ensure age is not negative
   }, [birthDate]);
 
+  const { years, months } = useMemo(() => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    // Calculate years
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+
+    // Adjust years and months
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    // Further adjust if day of month hasn't occurred yet
+    if (today.getDate() < birth.getDate()) {
+      months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+    }
+
+    // Calculate total months
+    const totalMonths = years * 12 + months;
+
+    return {
+      years: Math.max(0, years),
+      months: Math.max(0, months),
+      totalMonths: Math.max(0, totalMonths),
+    };
+  }, [birthDate]);
+
   // KMS reference lines (age in months, weight in kg)
   // Simplified version of Indonesian KMS standards
   const kmsReferenceBoy = {
@@ -222,196 +255,209 @@ const DateKMSChart = ({
   const status = calculateStatus(ageInMonths, weight);
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-lg">
-      <div className="mb-6">
-        <h2 className="mb-2 text-2xl font-bold text-gray-800">
-          KMS Weight Chart
-        </h2>
-        <div className="mb-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Birth Date:</span>
-            <span>{formatDate(birthDate)}</span>
+    <>
+      {years < 5 && (
+        <div className="rounded-lg bg-white p-6 shadow-lg">
+          <div className="mb-6">
+            <h2 className="mb-2 text-2xl font-bold text-gray-800">
+              KMS Weight Chart
+            </h2>
+            <div className="mb-4 flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Birth Date:</span>
+                <span>{formatDate(birthDate)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Age:</span>
+                <span>{years} Year</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Age:</span>
+                <span>{months} months</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Weight:</span>
+                <span>{weight} kg</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Gender:</span>
+                <span>{gender === "male" ? "Male" : "Female"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Status:</span>
+                <span
+                  className={`rounded px-2 py-1 text-sm font-medium ${
+                    status === "Normal"
+                      ? "bg-green-100 text-green-800"
+                      : status === "Underweight"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : status === "Severely Underweight"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-orange-100 text-orange-800"
+                  }`}
+                >
+                  {status}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Age:</span>
-            <span>{ageInMonths} months</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Weight:</span>
-            <span>{weight} kg</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Gender:</span>
-            <span>{gender === "male" ? "Male" : "Female"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Status:</span>
-            <span
-              className={`rounded px-2 py-1 text-sm font-medium ${
-                status === "Normal"
-                  ? "bg-green-100 text-green-800"
-                  : status === "Underweight"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : status === "Severely Underweight"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-orange-100 text-orange-800"
-              }`}
+
+          <div className="overflow-x-auto">
+            <svg
+              width={chartWidth}
+              height={chartHeight}
+              className="border border-gray-200"
             >
-              {status}
-            </span>
+              {/* Grid lines */}
+              {ageGridLines.map((gridAge) => (
+                <line
+                  key={`age-${gridAge}`}
+                  x1={getX(gridAge)}
+                  y1={padding.top}
+                  x2={getX(gridAge)}
+                  y2={chartHeight - padding.bottom}
+                  stroke="#e5e7eb"
+                  strokeDasharray="4 4"
+                />
+              ))}
+              {weightGridLines.map((gridWeight) => (
+                <line
+                  key={`weight-${gridWeight}`}
+                  x1={padding.left}
+                  y1={getY(gridWeight)}
+                  x2={chartWidth - padding.right}
+                  y2={getY(gridWeight)}
+                  stroke="#e5e7eb"
+                  strokeDasharray="4 4"
+                />
+              ))}
+
+              {/* Reference lines */}
+              <path
+                d={severelyUnderweightPath}
+                fill="none"
+                stroke="#ef4444"
+                strokeWidth="2"
+              />
+              <path
+                d={underweightPath}
+                fill="none"
+                stroke="#f59e0b"
+                strokeWidth="2"
+              />
+              <path
+                d={normalPath}
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="2"
+              />
+              <path
+                d={overweightPath}
+                fill="none"
+                stroke="#6366f1"
+                strokeWidth="2"
+              />
+
+              {/* Child data point */}
+              <circle
+                cx={getX(ageInMonths)}
+                cy={getY(weight)}
+                r="6"
+                fill="white"
+                stroke="#000"
+                strokeWidth="2"
+              />
+
+              {/* X and Y axis */}
+              <line
+                x1={padding.left}
+                y1={chartHeight - padding.bottom}
+                x2={chartWidth - padding.right}
+                y2={chartHeight - padding.bottom}
+                stroke="#374151"
+                strokeWidth="2"
+              />
+              <line
+                x1={padding.left}
+                y1={padding.top}
+                x2={padding.left}
+                y2={chartHeight - padding.bottom}
+                stroke="#374151"
+                strokeWidth="2"
+              />
+
+              {/* Axis labels */}
+              {ageGridLines.map((gridAge) => (
+                <text
+                  key={`age-label-${gridAge}`}
+                  x={getX(gridAge)}
+                  y={chartHeight - padding.bottom + 20}
+                  textAnchor="middle"
+                  fill="#4b5563"
+                  fontSize="12"
+                >
+                  {gridAge}
+                </text>
+              ))}
+              {weightGridLines.map((gridWeight) => (
+                <text
+                  key={`weight-label-${gridWeight}`}
+                  x={padding.left - 10}
+                  y={getY(gridWeight) + 4}
+                  textAnchor="end"
+                  fill="#4b5563"
+                  fontSize="12"
+                >
+                  {gridWeight}
+                </text>
+              ))}
+
+              {/* Axis titles */}
+              <text
+                x={chartWidth / 2}
+                y={chartHeight - 10}
+                textAnchor="middle"
+                fill="#1f2937"
+                fontSize="14"
+                fontWeight="bold"
+              >
+                Age (months)
+              </text>
+              <text
+                transform={`rotate(-90, 15, ${chartHeight / 2})`}
+                x="15"
+                y={chartHeight / 2}
+                textAnchor="middle"
+                fill="#1f2937"
+                fontSize="14"
+                fontWeight="bold"
+              >
+                Weight (kg)
+              </text>
+            </svg>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-4">
+            <div className="flex items-center">
+              <div className="mr-2 h-2 w-6 bg-green-500"></div>
+              <span className="text-sm">Normal</span>
+            </div>
+            <div className="flex items-center">
+              <div className="mr-2 h-2 w-6 bg-yellow-500"></div>
+              <span className="text-sm">Underweight (-2SD)</span>
+            </div>
+            <div className="flex items-center">
+              <div className="mr-2 h-2 w-6 bg-red-500"></div>
+              <span className="text-sm">Severely Underweight (-3SD)</span>
+            </div>
+            <div className="flex items-center">
+              <div className="mr-2 h-2 w-6 bg-indigo-500"></div>
+              <span className="text-sm">Overweight (+2SD)</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <svg
-          width={chartWidth}
-          height={chartHeight}
-          className="border border-gray-200"
-        >
-          {/* Grid lines */}
-          {ageGridLines.map((gridAge) => (
-            <line
-              key={`age-${gridAge}`}
-              x1={getX(gridAge)}
-              y1={padding.top}
-              x2={getX(gridAge)}
-              y2={chartHeight - padding.bottom}
-              stroke="#e5e7eb"
-              strokeDasharray="4 4"
-            />
-          ))}
-          {weightGridLines.map((gridWeight) => (
-            <line
-              key={`weight-${gridWeight}`}
-              x1={padding.left}
-              y1={getY(gridWeight)}
-              x2={chartWidth - padding.right}
-              y2={getY(gridWeight)}
-              stroke="#e5e7eb"
-              strokeDasharray="4 4"
-            />
-          ))}
-
-          {/* Reference lines */}
-          <path
-            d={severelyUnderweightPath}
-            fill="none"
-            stroke="#ef4444"
-            strokeWidth="2"
-          />
-          <path
-            d={underweightPath}
-            fill="none"
-            stroke="#f59e0b"
-            strokeWidth="2"
-          />
-          <path d={normalPath} fill="none" stroke="#10b981" strokeWidth="2" />
-          <path
-            d={overweightPath}
-            fill="none"
-            stroke="#6366f1"
-            strokeWidth="2"
-          />
-
-          {/* Child data point */}
-          <circle
-            cx={getX(ageInMonths)}
-            cy={getY(weight)}
-            r="6"
-            fill="white"
-            stroke="#000"
-            strokeWidth="2"
-          />
-
-          {/* X and Y axis */}
-          <line
-            x1={padding.left}
-            y1={chartHeight - padding.bottom}
-            x2={chartWidth - padding.right}
-            y2={chartHeight - padding.bottom}
-            stroke="#374151"
-            strokeWidth="2"
-          />
-          <line
-            x1={padding.left}
-            y1={padding.top}
-            x2={padding.left}
-            y2={chartHeight - padding.bottom}
-            stroke="#374151"
-            strokeWidth="2"
-          />
-
-          {/* Axis labels */}
-          {ageGridLines.map((gridAge) => (
-            <text
-              key={`age-label-${gridAge}`}
-              x={getX(gridAge)}
-              y={chartHeight - padding.bottom + 20}
-              textAnchor="middle"
-              fill="#4b5563"
-              fontSize="12"
-            >
-              {gridAge}
-            </text>
-          ))}
-          {weightGridLines.map((gridWeight) => (
-            <text
-              key={`weight-label-${gridWeight}`}
-              x={padding.left - 10}
-              y={getY(gridWeight) + 4}
-              textAnchor="end"
-              fill="#4b5563"
-              fontSize="12"
-            >
-              {gridWeight}
-            </text>
-          ))}
-
-          {/* Axis titles */}
-          <text
-            x={chartWidth / 2}
-            y={chartHeight - 10}
-            textAnchor="middle"
-            fill="#1f2937"
-            fontSize="14"
-            fontWeight="bold"
-          >
-            Age (months)
-          </text>
-          <text
-            transform={`rotate(-90, 15, ${chartHeight / 2})`}
-            x="15"
-            y={chartHeight / 2}
-            textAnchor="middle"
-            fill="#1f2937"
-            fontSize="14"
-            fontWeight="bold"
-          >
-            Weight (kg)
-          </text>
-        </svg>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-4">
-        <div className="flex items-center">
-          <div className="mr-2 h-2 w-6 bg-green-500"></div>
-          <span className="text-sm">Normal</span>
-        </div>
-        <div className="flex items-center">
-          <div className="mr-2 h-2 w-6 bg-yellow-500"></div>
-          <span className="text-sm">Underweight (-2SD)</span>
-        </div>
-        <div className="flex items-center">
-          <div className="mr-2 h-2 w-6 bg-red-500"></div>
-          <span className="text-sm">Severely Underweight (-3SD)</span>
-        </div>
-        <div className="flex items-center">
-          <div className="mr-2 h-2 w-6 bg-indigo-500"></div>
-          <span className="text-sm">Overweight (+2SD)</span>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

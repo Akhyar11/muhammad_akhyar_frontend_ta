@@ -22,7 +22,7 @@ export const initialState: MenuItems[] = [
     route: "/riwayat",
   },
   {
-    label: "Settings",
-    route: "/settings",
+    label: "Settings Is Maintenance",
+    route: "/not-found",
   },
 ];

@@ -3,6 +3,7 @@ import { userAtom } from "./user.store";
 import axios, { AxiosError } from "axios";
 import { axiosInstance } from "@/utils/axios.config";
 import useAuth from "../auth/auth.hook";
+import { getFromLocalStorage } from "@/utils/utils";
 
 export default function useUser() {
   const [state, userDispatch] = useAtom(userAtom);
@@ -78,9 +79,21 @@ export default function useUser() {
     }
   };
 
+  const getUser = () => {
+    const user = getFromLocalStorage("user_bmi_sistem");
+    return user as {
+      id: string;
+      username: string;
+      token: string;
+      jk: boolean;
+      tgl_lahir: string;
+    };
+  };
+
   return {
     ...state,
     me,
     updateUser,
+    getUser,
   };
 }

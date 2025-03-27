@@ -70,6 +70,7 @@ export default function SignInForm() {
           label="Sign In"
           model="success"
           type="submit"
+          disabled={loading}
           open={loading}
         />
       </div>

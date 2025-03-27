@@ -2,6 +2,7 @@ import { axiosInstance } from "@/utils/axios.config";
 import { useAtom } from "jotai";
 import { atomWithReducer } from "jotai/utils";
 import { useAuth } from "./auth.store";
+import { getFromLocalStorage } from "@/utils/utils";
 
 // Tipe untuk data dan state User
 interface UserState {
@@ -235,6 +236,17 @@ export const useUser = () => {
     });
   };
 
+  const getUser = () => {
+    const user = getFromLocalStorage("user_bmi_sistem");
+    return user as {
+      id: string;
+      username: string;
+      token: string;
+      jk: boolean;
+      tgl_lahir: string;
+    };
+  };
+
   return {
     ...state,
     user: state.dataSelect,
@@ -244,5 +256,6 @@ export const useUser = () => {
     updateUser,
     deleteUser,
     resetError,
+    getUser,
   };
 };

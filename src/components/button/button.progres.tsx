@@ -1,17 +1,19 @@
-import React from "react";
+import React, { Component } from "react";
 
 interface ButtonProps {
   type: "submit" | "reset" | "button";
-  model: "success" | "warning" | "attantion"; // Representing theme
+  model: "success" | "warning" | "attantion" | "none"; // Representing theme
   open: boolean; // Handle progress when open, text on button set to progress component
-  label: string;
+  label: any;
   onclick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
 const buttonStyles = {
   success: "bg-primary",
   attantion: "bg-warning",
   warning: "bg-danger",
+  none: "bg-transparent",
 };
 
 export default function ButtonProgres({
@@ -20,16 +22,18 @@ export default function ButtonProgres({
   open,
   label,
   onclick = () => {},
+  disabled = false,
 }: ButtonProps) {
   return (
     <button
       type={type}
       className={`flex w-full items-center justify-center rounded-lg px-4 py-2 font-semibold text-white ${buttonStyles[model]}`}
       onClick={onclick}
+      disabled={disabled}
     >
       {open ? (
         <svg
-          className="mr-3 h-5 w-5 animate-spin text-white"
+          className={`mr-3 h-5 w-5 animate-spin ${model === "none" ? "text-black" : "text-white"}`}
           fill="none"
           viewBox="0 0 24 24"
         >

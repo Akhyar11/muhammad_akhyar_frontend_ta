@@ -4,6 +4,8 @@ import { atom, useAtom } from "jotai";
 import Cookies from "js-cookie";
 import { atomWithReducer } from "jotai/utils";
 import { useRouter } from "next/navigation";
+// Import the saveToLocalStorage utility from the utils module
+import { saveToLocalStorage, removeFromLocalStorage } from "@/utils/utils";
 
 // Tipe untuk data dan state Auth
 interface AuthState {
@@ -89,20 +91,38 @@ export const useAuth = () => {
         id: string;
         username: string;
         token: string;
+        jk: boolean;
+        tgl_lahir: string;
       }>("/login", {
         username,
         password,
       });
 
-      const { id, token, username: fetchedUsername } = response.data;
+      const {
+        id,
+        token,
+        username: fetchedUsername,
+        jk,
+        tgl_lahir,
+      } = response.data;
 
       setId(id);
       setUsername(fetchedUsername);
       setToken(token);
 
+      // Set cookies for persistent auth
       Cookies.set("id", id.toString());
       Cookies.set("username", fetchedUsername);
       Cookies.set("token", token);
+
+      // Save user state to browser localStorage
+      saveToLocalStorage("user_bmi_sistem", {
+        id,
+        username: fetchedUsername,
+        token,
+        jk,
+        tgl_lahir,
+      });
 
       dispatch({
         type: "SET_AUTH",
@@ -147,6 +167,9 @@ export const useAuth = () => {
       Cookies.remove("username");
       Cookies.remove("token");
 
+      // Remove user state from localStorage
+      removeFromLocalStorage("user_bmi_sistem");
+
       dispatch({ type: "CLEAR_AUTH" });
     } catch (error: any) {
       dispatch({ type: "SET_ERROR", payload: error.response?.data.message });
@@ -177,11 +200,7 @@ export const useAuth = () => {
 
       dispatch({
         type: "SET_AUTH",
-        payload: {
-          id,
-          username: fetchedUsername,
-          token,
-        },
+        payload: { id, username: fetchedUsername, token },
       });
     } catch (error: any) {
       dispatch({ type: "SET_ERROR", payload: error.response?.data.message });
@@ -203,6 +222,9 @@ export const useAuth = () => {
     Cookies.remove("id");
     Cookies.remove("username");
     Cookies.remove("token");
+
+    // Remove user state from localStorage
+    removeFromLocalStorage("user_bmi_sistem");
 
     dispatch({ type: "CLEAR_AUTH" });
     router.push("/auth/login");

@@ -11,15 +11,10 @@ import { calculateAge } from "@/utils/calculate.age";
 
 const DashboardComponent: React.FC = () => {
   const { loading, fetchAnthropometry, data } = useAnthropometry();
-  const { user } = useUser();
+  const { getUser } = useUser();
+  const user = getUser();
 
-  const [birthDate, setBirthDate] = useState();
   const [bb, setBB] = useState();
-  const [gander, setGander] = useState<"male" | "female">();
-  const [age, setAge] = useState<{ age: number; months: number }>({
-    age: 0,
-    months: 0,
-  });
 
   const colomns: ColumnConfig[] = [
     {
@@ -122,13 +117,8 @@ const DashboardComponent: React.FC = () => {
   useEffect(() => {
     if (user && data[0]) {
       setBB(data.slice(-1)[0].weight);
-      setBirthDate((user as any).tgl_lahir);
-      setGander((user as any).jk ? "male" : "female");
-      setAge(calculateAge(new Date((user as any).tgl_lahir)));
     }
   }, [user]);
-
-  console.log(user, data);
 
   return (
     <>
@@ -145,10 +135,24 @@ const DashboardComponent: React.FC = () => {
             />
           </div>
         </div>
-        {(user as any).id && (
-          <DateKMSChart birthDate={birthDate} gender={gander} weight={bb} />
+        {user && (
+          <>
+            <DateKMSChart
+              birthDate={user.tgl_lahir}
+              gender={user.jk ? "male" : "female"}
+              weight={bb}
+            />
+            <Table
+              columns={
+                calculateAge(new Date(user.tgl_lahir)).age > 5
+                  ? colomns
+                  : colomnsKSM
+              }
+              data={data}
+            />
+          </>
         )}
-        <Table columns={age.age > 5 ? colomns : colomnsKSM} data={data} />
+
         <BMIIntelligence />
       </div>
     </>

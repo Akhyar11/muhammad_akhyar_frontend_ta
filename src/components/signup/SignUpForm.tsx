@@ -145,6 +145,7 @@ export default function SignUpForm() {
           label="Sign Up"
           model="success"
           type="submit"
+          disabled={loading}
           open={loading}
         />
       </div>

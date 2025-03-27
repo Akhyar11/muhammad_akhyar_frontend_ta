@@ -17,7 +17,7 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
           <Image
             width={40}
             height={40}
-            src="/images/user/user-01.png"
+            src="/images/AI-Icon.png"
             alt="AI"
             className="rounded-full"
           />
@@ -39,7 +39,7 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
           <Image
             width={40}
             height={40}
-            src="/images/user/user-02.png"
+            src="/images/icon/icon-user-man.jpg"
             alt="User"
             className="rounded-full"
           />
@@ -53,16 +53,18 @@ const ChatCard = () => {
   const [messages, setMessages] = useState("");
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [animation, setAnimation] = useState<ScrollBehavior>("instant");
-  const chatEndRef = useRef<HTMLDivElement | null>(null); // Tambahkan useRef
+  const [isLoading, setIsLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const { getToken } = useAuth();
-  const { user, me, loading } = useUser();
+  const { me, loading, getUser } = useUser();
+  const user = getUser();
   const token = getToken();
 
-  const getMessage = async () => {
+  const fetchInitialMessages = async () => {
     try {
       const response = await axiosInstance.get(
-        `/convertation?userId=${(user as any).id}&limit=9999`,
+        `/convertation?userId=${user.id}&limit=9999`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -76,46 +78,62 @@ const ChatCard = () => {
 
       setChatMessages(chat);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching messages:", error);
     }
   };
 
   const handleSendMessage = async () => {
-    const chat: any = [];
+    // Prevent sending empty messages or while loading
+    if (!messages.trim() || isLoading) return;
+
     try {
+      setIsLoading(true);
       setAnimation("smooth");
-      chat.push({ message: messages, user: "user" });
-      setChatMessages([...chatMessages, { message: messages, user: "user" }]);
+
+      // Add user message immediately
+      const updatedChatMessages = [
+        ...chatMessages,
+        { message: messages, user: "user" },
+      ];
+      setChatMessages(updatedChatMessages);
+
+      // Prepare for AI response
+      const payload = {
+        userMessage: messages,
+        userId: user.id,
+      };
+
+      // Send message and get AI response
+      const response = await axiosInstance.post("/convertation", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Add AI response
+      const aiResponse = response.data.AIMessage;
+      setChatMessages([
+        ...updatedChatMessages,
+        { message: aiResponse, user: "AI" },
+      ]);
+
+      // Reset input
       setMessages("");
-
-      const response = await axiosInstance.post(
-        "/convertation",
-        { userMessage: messages, userId: (user as any).id },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-
-      chat.push({ message: response.data.AIMessage, user: "AI" });
-      await getMessage();
     } catch (error) {
-      console.log(error);
+      console.error("Error sending message:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Gunakan useEffect untuk scroll ke bawah saat chatMessages berubah
+  // Scroll to bottom when messages change
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: animation });
-  }, [chatMessages]);
+  }, [chatMessages, animation]);
 
+  // Fetch user data and initial messages
   useEffect(() => {
     me();
+    fetchInitialMessages();
   }, []);
-
-  useEffect(() => {
-    if ((user as any).id) {
-      setAnimation("instant");
-      getMessage();
-    }
-  }, [(user as any).id]);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
@@ -129,7 +147,6 @@ const ChatCard = () => {
             {chatMessages.map((chat, index) => (
               <Chat key={index} message={chat.message} user={chat.user} />
             ))}
-            {/* Elemen dummy untuk scroll ke bawah */}
             <div ref={chatEndRef}></div>
           </div>
         </div>
@@ -143,14 +160,15 @@ const ChatCard = () => {
               className="w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
               value={messages}
               onKeyDown={(e) =>
-                loading.read && e.key === "Enter" && handleSendMessage()
+                e.key === "Enter" && !isLoading && handleSendMessage()
               }
               onChange={(e) => setMessages(e.target.value)}
+              disabled={isLoading}
             />
             <button
-              onClick={() => handleSendMessage()}
-              disabled={!loading.read}
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white hover:bg-opacity-90"
+              onClick={handleSendMessage}
+              disabled={!messages.trim() || isLoading}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white hover:bg-opacity-90 disabled:opacity-50"
             >
               <svg
                 className="fill-current"
