@@ -5,7 +5,11 @@ import Cookies from "js-cookie";
 import { atomWithReducer } from "jotai/utils";
 import { useRouter } from "next/navigation";
 // Import the saveToLocalStorage utility from the utils module
-import { saveToLocalStorage, removeFromLocalStorage } from "@/utils/utils";
+import {
+  saveToLocalStorage,
+  removeFromLocalStorage,
+  getFromLocalStorage,
+} from "@/utils/utils";
 
 // Tipe untuk data dan state Auth
 interface AuthState {
@@ -157,7 +161,8 @@ export const useAuth = () => {
   const logout = async (): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      await axiosInstance.post("/logout", { token });
+      const user = getFromLocalStorage("user_bmi_sistem");
+      await axiosInstance.post("/logout", { token: (user as any).token });
 
       setId(null);
       setUsername(null);
@@ -171,6 +176,7 @@ export const useAuth = () => {
       removeFromLocalStorage("user_bmi_sistem");
 
       dispatch({ type: "CLEAR_AUTH" });
+      window.location.href = "/auth/login";
     } catch (error: any) {
       dispatch({ type: "SET_ERROR", payload: error.response?.data.message });
     } finally {
