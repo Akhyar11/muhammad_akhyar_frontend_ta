@@ -61,16 +61,16 @@ function ImageFormComp() {
       avatar: null,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (user) {
         const formData = new FormData();
         formData.append("picture", values.avatar as any);
-        updatePicture(user.id, formData, () => {
+        await updatePicture(user.id, formData, () => {
           triggerPopup("success", "Profile picture uploaded successfully.");
           formik.resetForm();
         });
 
-        me();
+        await me();
       }
     },
   });

@@ -62,7 +62,7 @@ export default function useProfil() {
     profilDispatch({ payload: { status: "loading" } });
 
     try {
-      await axiosInstance.post(`/profils/${userId}/upload`, formData, {
+      await axiosInstance.post(`/profils/upload/${userId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data", // Tambahkan ini
           Authorization: `Bearer ${token}`,
