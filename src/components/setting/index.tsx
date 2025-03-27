@@ -13,6 +13,7 @@ import { useUser } from "@/store/user.store";
 import QRCodeGenerator from "./qrCode";
 import { saveToLocalStorage } from "@/utils/utils";
 import { axiosInstance } from "@/utils/axios.config";
+import ButtonProgres from "../button/button.progres";
 
 interface PersonalInformation {
   nama_lengkap: string;
@@ -333,20 +334,13 @@ export default function SettingComponent() {
                     >
                       Cancel
                     </button>
-                    <button
-                      className="flex justify-center rounded bg-primary px-6 py-2 font-medium text-gray hover:bg-opacity-90 disabled:opacity-70"
+                    <ButtonProgres
+                      label="Save"
+                      model="success"
                       type="submit"
+                      open={isSubmittingProfile}
                       disabled={isSubmittingProfile}
-                    >
-                      {isSubmittingProfile ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save"
-                      )}
-                    </button>
+                    />
                   </div>
                 </form>
               </div>
@@ -442,20 +436,13 @@ export default function SettingComponent() {
                     >
                       Cancel
                     </button>
-                    <button
-                      className="flex justify-center rounded bg-primary px-6 py-2 font-medium text-gray hover:bg-opacity-90 disabled:opacity-70"
+                    <ButtonProgres
+                      label="Save"
+                      model="success"
                       type="submit"
+                      open={isSubmittingPassword}
                       disabled={isSubmittingPassword}
-                    >
-                      {isSubmittingPassword ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save"
-                      )}
-                    </button>
+                    />
                   </div>
                 </form>
               </div>

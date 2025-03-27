@@ -7,6 +7,7 @@ import PopupFormikError from "../formik/popupFormikError";
 import PopupFormikDelete from "../formik/popupFormikDelate";
 import PopupStatus from "../alerts/popupStatus";
 import { useUser } from "@/store/user.store";
+import ButtonProgres from "../button/button.progres";
 
 // Validation schema using yup
 const validationSchema = yup.object().shape({
@@ -42,6 +43,7 @@ function ImageFormComp() {
   );
 
   const [popupMessage, setPopupMessage] = useState("");
+  const [loadingPicture, setLoadingPicture] = useState(false);
 
   // Fungsi untuk memunculkan popup
   const triggerPopup = (status: "success" | "error", message: string) => {
@@ -63,6 +65,7 @@ function ImageFormComp() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       if (user) {
+        setLoadingPicture(true);
         const formData = new FormData();
         formData.append("picture", values.avatar as any);
         await updatePicture(user.id, formData, () => {
@@ -71,6 +74,7 @@ function ImageFormComp() {
         });
 
         await me();
+        setLoadingPicture(false);
       }
     },
   });
@@ -196,12 +200,13 @@ function ImageFormComp() {
           >
             Cancel
           </button>
-          <button
-            className="flex justify-center rounded bg-primary px-6 py-2 font-medium text-gray hover:bg-opacity-90"
+          <ButtonProgres
+            label="Save"
+            model="success"
             type="submit"
-          >
-            Save
-          </button>
+            open={loadingPicture}
+            disabled={loadingPicture}
+          />
         </div>
       </form>
 
