@@ -91,24 +91,12 @@ export const useAuth = () => {
   ): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const response = await axiosInstance.post<{
-        id: string;
-        username: string;
-        token: string;
-        jk: boolean;
-        tgl_lahir: string;
-      }>("/login", {
+      const response = await axiosInstance.post("/login", {
         username,
         password,
       });
 
-      const {
-        id,
-        token,
-        username: fetchedUsername,
-        jk,
-        tgl_lahir,
-      } = response.data;
+      const { id, token, username: fetchedUsername } = response.data;
 
       setId(id);
       setUsername(fetchedUsername);
@@ -120,13 +108,7 @@ export const useAuth = () => {
       Cookies.set("token", token);
 
       // Save user state to browser localStorage
-      saveToLocalStorage("user_bmi_sistem", {
-        id,
-        username: fetchedUsername,
-        token,
-        jk,
-        tgl_lahir,
-      });
+      saveToLocalStorage("user_bmi_sistem", response.data);
 
       dispatch({
         type: "SET_AUTH",

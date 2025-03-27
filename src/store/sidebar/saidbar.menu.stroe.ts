@@ -23,6 +23,6 @@ export const initialState: MenuItems[] = [
   },
   {
     label: "Settings Is Maintenance",
-    route: "/not-found",
+    route: "/settings",
   },
 ];

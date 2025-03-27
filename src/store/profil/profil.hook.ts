@@ -96,19 +96,20 @@ export default function useProfil() {
     }
   };
 
-  const updatePicture = async (formData: any, cb?: Function) => {
+  const updatePicture = async (
+    userId: string,
+    formData: any,
+    cb?: Function,
+  ) => {
     profilDispatch({ payload: { status: "loading" } });
 
     try {
-      await axiosInstance.post(
-        `/profils/${state.profil?.id}/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      await axiosInstance.post(`/profils/${userId}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Tambahkan ini
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       getPicture();
 
@@ -127,18 +128,18 @@ export default function useProfil() {
     }
   };
 
-  const updateProfil = async (body: any, cb: Function = () => {}) => {
+  const updateProfil = async (
+    userId: string,
+    body: any,
+    cb: Function = () => {},
+  ) => {
     profilDispatch({ payload: { status: "loading" } });
     try {
-      const response = await axiosInstance.put(
-        `/profils/${state.profil?.id}`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      await axiosInstance.put(`/profils/${userId}`, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const oldProfil = state.profil;
 

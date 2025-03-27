@@ -252,6 +252,10 @@ export const useUser = () => {
       token: string;
       jk: boolean;
       tgl_lahir: string;
+      nama_lengkap: string;
+      summary: string;
+      avatarUrl: string;
+      userId: string;
     };
   };
 

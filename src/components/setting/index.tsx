@@ -11,6 +11,8 @@ import PopupStatus from "../alerts/popupStatus";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/store/user.store";
 import QRCodeGenerator from "./qrCode";
+import { saveToLocalStorage } from "@/utils/utils";
+import { axiosInstance } from "@/utils/axios.config";
 
 interface PersonalInformation {
   nama_lengkap: string;
@@ -44,19 +46,12 @@ export default function SettingComponent() {
     endDate: null,
   });
   const [umur, setUmur] = useState<any>("");
-  const [personalInformation, setPersonalInformation] =
-    useState<PersonalInformation>();
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
 
-  const {
-    getProfil,
-    profil,
-    updateProfil,
-    status: profilStatus,
-    error: profilError,
-  } = useProfil();
-  const { user, updateUser, error: userError, resetError } = useUser();
+  const { updateProfil, status: profilStatus } = useProfil();
+  const { updateUser, error: userError, resetError, getUser } = useUser();
+  const user = getUser();
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupStatus, setPopupStatus] = useState<"success" | "error">(
@@ -66,10 +61,10 @@ export default function SettingComponent() {
 
   const formik = useFormik({
     initialValues: {
-      nama_lengkap: personalInformation?.nama_lengkap || "",
-      tanggal_lahir: personalInformation?.tanggal_lahir || "",
-      username: personalInformation?.username || "",
-      jenis_kelamin: personalInformation?.jenis_kelamin,
+      nama_lengkap: user.nama_lengkap || "",
+      tanggal_lahir: user.tgl_lahir || "",
+      username: user.username || "",
+      jenis_kelamin: user.jk,
       password: "",
       konfirmasi_password: "",
     },
@@ -84,12 +79,17 @@ export default function SettingComponent() {
         };
 
         if (user) {
-          updateUser((user as any).id, body);
-        }
+          await updateUser(user.id, body);
+          await updateProfil(user.id, { nama_lengkap: values.nama_lengkap });
 
-        await Promise.all([
-          updateProfil({ nama_lengkap: values.nama_lengkap }),
-        ]);
+          const newUserData = {
+            ...user,
+            ...body,
+            nama_lengkap: values.nama_lengkap,
+          };
+
+          saveToLocalStorage("user_bmi_sistem", newUserData);
+        }
       } catch (error) {
         triggerPopup("error", "Failed to update profile");
       } finally {
@@ -108,10 +108,13 @@ export default function SettingComponent() {
     onSubmit: async (values) => {
       setIsSubmittingPassword(true);
       try {
-        // Your password update logic here
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-        triggerPopup("success", "Password updated successfully");
+        await axiosInstance.put("/users/" + user.id + "/password", values, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
         formikUbahPassword.resetForm();
+        triggerPopup("success", "Success to update password");
       } catch (error) {
         triggerPopup("error", "Failed to update password");
       } finally {
@@ -136,10 +139,6 @@ export default function SettingComponent() {
   };
 
   useEffect(() => {
-    if (user && (user as any).id) getProfil();
-  }, [(user as any).id]);
-
-  useEffect(() => {
     if (date?.startDate) {
       const value = date.startDate.toDateString();
       setUmur(calculateAge(value));
@@ -147,58 +146,20 @@ export default function SettingComponent() {
   }, [date]);
 
   useEffect(() => {
-    if (profilStatus === "failed") {
-      const errorMessage = profilError;
-      triggerPopup("error", errorMessage);
+    if (user) {
+      setUmur(calculateAge(user.tgl_lahir));
+      setDate({
+        startDate: new Date(user.tgl_lahir),
+        endDate: new Date(user.tgl_lahir),
+      });
     }
-  }, [profilStatus, profilError]);
+  }, []);
 
   useEffect(() => {
     if (profilStatus === "succeeded") {
       triggerPopup("success", "Profile updated successfully");
     }
   }, [profilStatus]);
-
-  useEffect(() => {
-    if (user) {
-      setPersonalInformation({
-        username: (user as any).username,
-        jenis_kelamin: (user as any).jk,
-        nama_lengkap: "",
-        tanggal_lahir: (user as any).tgl_lahir,
-      });
-
-      setDate({
-        startDate: new Date((user as any).tgl_lahir),
-        endDate: new Date((user as any).tgl_lahir),
-      });
-
-      formik.setValues({
-        nama_lengkap: "",
-        tanggal_lahir: (user as any).tgl_lahir,
-        username: (user as any).username,
-        jenis_kelamin: (user as any).jk,
-        password: "",
-        konfirmasi_password: "",
-      });
-    }
-
-    if (
-      profil &&
-      profil.nama_lengkap !== "" &&
-      user &&
-      (user as any).id !== ""
-    ) {
-      if (personalInformation) {
-        setPersonalInformation({
-          ...personalInformation,
-          nama_lengkap: profil.nama_lengkap,
-        });
-      }
-
-      formik.setValues({ ...formik.values, nama_lengkap: profil.nama_lengkap });
-    }
-  }, [profil, user]);
 
   return (
     <>
@@ -506,13 +467,13 @@ export default function SettingComponent() {
         </div>
       </div>
 
-      {/* {showPopup && (
+      {showPopup && (
         <PopupStatus
           status={popupStatus}
           message={popupMessage}
           onClose={closePopup}
         />
-      )} */}
+      )}
 
       {/* get data error */}
       {userError.read && (

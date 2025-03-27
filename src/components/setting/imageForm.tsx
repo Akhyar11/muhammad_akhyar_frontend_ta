@@ -6,6 +6,7 @@ import * as yup from "yup";
 import PopupFormikError from "../formik/popupFormikError";
 import PopupFormikDelete from "../formik/popupFormikDelate";
 import PopupStatus from "../alerts/popupStatus";
+import { useUser } from "@/store/user.store";
 
 // Validation schema using yup
 const validationSchema = yup.object().shape({
@@ -32,6 +33,8 @@ function ImageFormComp() {
   const [userAvatarUrl, setAvatarUrl] = useState<any>(undefined);
   const [isDelete, setDelete] = useState(false);
   const { profil, deleteAvatar, status, error, updatePicture } = useProfil();
+  const { getUser } = useUser();
+  const user = getUser();
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupStatus, setPopupStatus] = useState<"success" | "error">(
@@ -60,8 +63,8 @@ function ImageFormComp() {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       const formData = new FormData();
-      formData.append("avatar", values.avatar as unknown as Blob);
-      updatePicture(formData, () => {
+      formData.append("picture", values.avatar as any);
+      updatePicture(user.id, formData, () => {
         triggerPopup("success", "Profile picture uploaded successfully.");
         formik.resetForm();
       });
@@ -121,7 +124,9 @@ function ImageFormComp() {
             accept="image/*"
             onChange={(event) => {
               const file = event.currentTarget.files?.[0];
-              formik.setFieldValue("avatar", file);
+              if (file) {
+                formik.setFieldValue("avatar", file);
+              }
             }}
             className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
           />
