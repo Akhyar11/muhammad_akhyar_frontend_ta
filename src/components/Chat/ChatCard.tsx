@@ -38,15 +38,17 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
 
       {user === "user" && (
         <div className="relative h-10 w-10 rounded-full">
-          <Image
-            src={userI.avatarUrl}
-            onError={(e) =>
-              ((e.target as any).src = "/images/icon/icon-user-man.jpg")
-            }
-            width={40}
-            height={40}
-            alt="User"
-          />
+          {userI && (
+            <Image
+              src={userI.avatarUrl}
+              onError={(e) =>
+                ((e.target as any).src = "/images/icon/icon-user-man.jpg")
+              }
+              width={40}
+              height={40}
+              alt="User"
+            />
+          )}
         </div>
       )}
     </div>
@@ -61,26 +63,28 @@ const ChatCard = () => {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const { getToken } = useAuth();
-  const { me, loading, getUser } = useUser();
+  const { me, getUser } = useUser();
   const user = getUser();
   const token = getToken();
 
   const fetchInitialMessages = async () => {
     try {
-      const response = await axiosInstance.get(
-        `/convertation?userId=${user.id}&limit=9999`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      if (user) {
+        const response = await axiosInstance.get(
+          `/convertation?userId=${user.id}&limit=9999`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-      const chat: any = [];
-      response.data.forEach((data: any) => {
-        chat.push({ message: data.userMessage, user: "user" });
-        chat.push({ message: data.AIMessage, user: "AI" });
-      });
+        const chat: any = [];
+        response.data.forEach((data: any) => {
+          chat.push({ message: data.userMessage, user: "user" });
+          chat.push({ message: data.AIMessage, user: "AI" });
+        });
 
-      setChatMessages(chat);
+        setChatMessages(chat);
+      }
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -91,36 +95,38 @@ const ChatCard = () => {
     if (!messages.trim() || isLoading) return;
 
     try {
-      setIsLoading(true);
-      setAnimation("smooth");
+      if (user) {
+        setIsLoading(true);
+        setAnimation("smooth");
 
-      // Add user message immediately
-      const updatedChatMessages = [
-        ...chatMessages,
-        { message: messages, user: "user" },
-      ];
-      setChatMessages(updatedChatMessages);
+        // Add user message immediately
+        const updatedChatMessages = [
+          ...chatMessages,
+          { message: messages, user: "user" },
+        ];
+        setChatMessages(updatedChatMessages);
 
-      // Prepare for AI response
-      const payload = {
-        userMessage: messages,
-        userId: user.id,
-      };
+        // Prepare for AI response
+        const payload = {
+          userMessage: messages,
+          userId: user.id,
+        };
 
-      // Send message and get AI response
-      const response = await axiosInstance.post("/convertation", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        // Send message and get AI response
+        const response = await axiosInstance.post("/convertation", payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      // Add AI response
-      const aiResponse = response.data.AIMessage;
-      setChatMessages([
-        ...updatedChatMessages,
-        { message: aiResponse, user: "AI" },
-      ]);
+        // Add AI response
+        const aiResponse = response.data.AIMessage;
+        setChatMessages([
+          ...updatedChatMessages,
+          { message: aiResponse, user: "AI" },
+        ]);
 
-      // Reset input
-      setMessages("");
+        // Reset input
+        setMessages("");
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {

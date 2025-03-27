@@ -62,14 +62,16 @@ function ImageFormComp() {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      const formData = new FormData();
-      formData.append("picture", values.avatar as any);
-      updatePicture(user.id, formData, () => {
-        triggerPopup("success", "Profile picture uploaded successfully.");
-        formik.resetForm();
-      });
+      if (user) {
+        const formData = new FormData();
+        formData.append("picture", values.avatar as any);
+        updatePicture(user.id, formData, () => {
+          triggerPopup("success", "Profile picture uploaded successfully.");
+          formik.resetForm();
+        });
 
-      me();
+        me();
+      }
     },
   });
 
@@ -92,15 +94,17 @@ function ImageFormComp() {
       <form onSubmit={formik.handleSubmit}>
         <div className="mb-4 flex gap-3">
           <div className="h-14 w-14 rounded-full">
-            <Image
-              src={user.avatarUrl}
-              onError={(e) =>
-                ((e.target as any).src = "/images/icon/icon-user-man.jpg")
-              }
-              width={55}
-              height={55}
-              alt="User"
-            />
+            {user && (
+              <Image
+                src={user.avatarUrl}
+                onError={(e) =>
+                  ((e.target as any).src = "/images/icon/icon-user-man.jpg")
+                }
+                width={55}
+                height={55}
+                alt="User"
+              />
+            )}
           </div>
           <div>
             <span className="mb-1.5 text-black dark:text-white">

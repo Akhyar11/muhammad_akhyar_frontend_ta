@@ -247,17 +247,19 @@ export const useUser = () => {
 
   const getUser = () => {
     const user = getFromLocalStorage("user_bmi_sistem");
-    return user as {
-      id: string;
-      username: string;
-      token: string;
-      jk: boolean;
-      tgl_lahir: string;
-      nama_lengkap: string;
-      summary: string;
-      avatarUrl: string;
-      userId: string;
-    };
+    return user
+      ? (user as {
+          id: string;
+          username: string;
+          token: string;
+          jk: boolean;
+          tgl_lahir: string;
+          nama_lengkap: string;
+          summary: string;
+          avatarUrl: string;
+          userId: string;
+        })
+      : null;
   };
 
   return {

@@ -14,8 +14,10 @@
  */
 export function saveToLocalStorage<T>(key: string, value: T): void {
   try {
-    const serializedValue = JSON.stringify(value);
-    localStorage.setItem(key, serializedValue);
+    if (typeof window !== "undefined") {
+      const serializedValue = JSON.stringify(value);
+      localStorage.setItem(key, serializedValue);
+    }
   } catch (error) {
     console.error(`Error saving to localStorage: ${error}`);
   }
@@ -28,11 +30,14 @@ export function saveToLocalStorage<T>(key: string, value: T): void {
  */
 export function getFromLocalStorage<T>(key: string): T | null {
   try {
-    const item = localStorage.getItem(key);
-    if (item === null) {
-      return null;
+    if (typeof window !== "undefined") {
+      const item = localStorage.getItem(key);
+      if (item === null) {
+        return null;
+      }
+      return JSON.parse(item) as T;
     }
-    return JSON.parse(item) as T;
+    return null;
   } catch (error) {
     console.error(`Error reading from localStorage: ${error}`);
     return null;
@@ -45,7 +50,7 @@ export function getFromLocalStorage<T>(key: string): T | null {
  */
 export function removeFromLocalStorage(key: string): void {
   try {
-    localStorage.removeItem(key);
+    if (typeof window !== "undefined") localStorage.removeItem(key);
   } catch (error) {
     console.error(`Error removing from localStorage: ${error}`);
   }
@@ -56,7 +61,7 @@ export function removeFromLocalStorage(key: string): void {
  */
 export function clearLocalStorage(): void {
   try {
-    localStorage.clear();
+    if (typeof window !== "undefined") localStorage.clear();
   } catch (error) {
     console.error(`Error clearing localStorage: ${error}`);
   }
@@ -68,7 +73,8 @@ export function clearLocalStorage(): void {
  */
 export function getLocalStorageKeys(): string[] {
   try {
-    return Object.keys(localStorage);
+    if (typeof window !== "undefined") return Object.keys(localStorage);
+    return [];
   } catch (error) {
     console.error(`Error getting localStorage keys: ${error}`);
     return [];

@@ -61,10 +61,10 @@ export default function SettingComponent() {
 
   const formik = useFormik({
     initialValues: {
-      nama_lengkap: user.nama_lengkap || "",
-      tanggal_lahir: user.tgl_lahir || "",
-      username: user.username || "",
-      jenis_kelamin: user.jk,
+      nama_lengkap: user?.nama_lengkap || "",
+      tanggal_lahir: user?.tgl_lahir || "",
+      username: user?.username || "",
+      jenis_kelamin: user?.jk,
       password: "",
       konfirmasi_password: "",
     },
@@ -108,13 +108,15 @@ export default function SettingComponent() {
     onSubmit: async (values) => {
       setIsSubmittingPassword(true);
       try {
-        await axiosInstance.put("/users/" + user.id + "/password", values, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        formikUbahPassword.resetForm();
-        triggerPopup("success", "Success to update password");
+        if (user) {
+          await axiosInstance.put("/users/" + user.id + "/password", values, {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          });
+          formikUbahPassword.resetForm();
+          triggerPopup("success", "Success to update password");
+        }
       } catch (error) {
         triggerPopup("error", "Failed to update password");
       } finally {

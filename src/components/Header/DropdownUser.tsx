@@ -31,15 +31,17 @@ const DropdownUser = () => {
         )}
 
         <span className="h-12 w-12 rounded-full">
-          <Image
-            src={user.avatarUrl}
-            onError={(e) =>
-              ((e.target as any).src = "/images/icon/icon-user-man.jpg")
-            }
-            width={125}
-            height={125}
-            alt="User"
-          />
+          {user && (
+            <Image
+              src={user.avatarUrl}
+              onError={(e) =>
+                ((e.target as any).src = "/images/icon/icon-user-man.jpg")
+              }
+              width={125}
+              height={125}
+              alt="User"
+            />
+          )}
         </span>
 
         <svg

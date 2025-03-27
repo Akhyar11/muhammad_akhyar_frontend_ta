@@ -138,13 +138,13 @@ const DashboardComponent: React.FC = () => {
         {user && (
           <>
             <DateKMSChart
-              birthDate={user.tgl_lahir}
-              gender={user.jk ? "male" : "female"}
+              birthDate={user?.tgl_lahir}
+              gender={user?.jk ? "male" : "female"}
               weight={bb}
             />
             <Table
               columns={
-                calculateAge(new Date(user.tgl_lahir)).age > 5
+                calculateAge(new Date(user?.tgl_lahir)).age > 5
                   ? colomns
                   : colomnsKSM
               }

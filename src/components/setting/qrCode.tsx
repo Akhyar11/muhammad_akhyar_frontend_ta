@@ -14,7 +14,7 @@ export default function QRCodeGenerator() {
           </h3>
         </div>
         <div className="flex items-center justify-center p-7">
-          {user.id && <QRCodeSVG value={user.id} size={200} />}
+          {user && <QRCodeSVG value={user.id} size={200} />}
         </div>
       </div>
     </div>
