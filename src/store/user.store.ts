@@ -126,9 +126,11 @@ export const useUser = () => {
   const me = async () => {
     setLoading("read", true);
     try {
-      const response = await axiosInstance.post("/me", { token });
-      setDataSelect(response.data?.data);
-      saveToLocalStorage("user_bmi_sistem", response.data?.data);
+      if (token) {
+        const response = await axiosInstance.post("/me", { token });
+        setDataSelect(response.data?.data);
+        saveToLocalStorage("user_bmi_sistem", response.data?.data);
+      }
     } catch (error: any) {
       const errorMessage = error.response?.data.message;
       if (errorMessage === "not login, please login") {

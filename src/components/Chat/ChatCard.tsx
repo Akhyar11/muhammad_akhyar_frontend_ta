@@ -73,7 +73,7 @@ const ChatCard = () => {
         const response = await axiosInstance.get(
           `/convertation?userId=${user.id}&limit=9999`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${user.token}` },
           },
         );
 
@@ -114,7 +114,7 @@ const ChatCard = () => {
 
         // Send message and get AI response
         const response = await axiosInstance.post("/convertation", payload, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${user.token}` },
         });
 
         // Add AI response
