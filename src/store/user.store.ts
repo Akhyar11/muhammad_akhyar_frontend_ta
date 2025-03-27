@@ -2,7 +2,7 @@ import { axiosInstance } from "@/utils/axios.config";
 import { useAtom } from "jotai";
 import { atomWithReducer } from "jotai/utils";
 import { useAuth } from "./auth.store";
-import { getFromLocalStorage } from "@/utils/utils";
+import { getFromLocalStorage, saveToLocalStorage } from "@/utils/utils";
 
 // Tipe untuk data dan state User
 interface UserState {
@@ -128,6 +128,7 @@ export const useUser = () => {
     try {
       const response = await axiosInstance.post("/me", { token });
       setDataSelect(response.data?.data);
+      saveToLocalStorage("user_bmi_sistem", response.data?.data);
     } catch (error: any) {
       const errorMessage = error.response?.data.message;
       if (errorMessage === "not login, please login") {

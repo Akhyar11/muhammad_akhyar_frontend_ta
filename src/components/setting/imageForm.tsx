@@ -33,7 +33,7 @@ function ImageFormComp() {
   const [userAvatarUrl, setAvatarUrl] = useState<any>(undefined);
   const [isDelete, setDelete] = useState(false);
   const { profil, deleteAvatar, status, error, updatePicture } = useProfil();
-  const { getUser } = useUser();
+  const { getUser, me } = useUser();
   const user = getUser();
 
   const [showPopup, setShowPopup] = useState(false);
@@ -68,6 +68,8 @@ function ImageFormComp() {
         triggerPopup("success", "Profile picture uploaded successfully.");
         formik.resetForm();
       });
+
+      me();
     },
   });
 
@@ -91,8 +93,9 @@ function ImageFormComp() {
         <div className="mb-4 flex gap-3">
           <div className="h-14 w-14 rounded-full">
             <Image
-              src={
-                userAvatarUrl ? userAvatarUrl : "/images/icon/icon-user-man.jpg"
+              src={user.avatarUrl}
+              onError={(e) =>
+                ((e.target as any).src = "/images/icon/icon-user-man.jpg")
               }
               width={55}
               height={55}

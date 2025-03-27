@@ -2,9 +2,9 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
-import useUser from "@/store/user/user.hook";
 import ButtonProgres from "../button/button.progres";
 import { useAuth } from "@/store/auth.store";
+import { useUser } from "@/store/user.store";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -32,13 +32,12 @@ const DropdownUser = () => {
 
         <span className="h-12 w-12 rounded-full">
           <Image
-            width={112}
-            height={112}
-            src={"/images/icon/icon-user-man.jpg"}
-            style={{
-              width: "auto",
-              height: "auto",
-            }}
+            src={user.avatarUrl}
+            onError={(e) =>
+              ((e.target as any).src = "/images/icon/icon-user-man.jpg")
+            }
+            width={125}
+            height={125}
             alt="User"
           />
         </span>

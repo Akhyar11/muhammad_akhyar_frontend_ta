@@ -8,6 +8,8 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
 const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
+  const { getUser } = useUser();
+  const userI = getUser();
   return (
     <div
       className={`flex items-start ${user === "user" ? "justify-end" : "justify-start"} gap-3`}
@@ -37,11 +39,13 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
       {user === "user" && (
         <div className="relative h-10 w-10 rounded-full">
           <Image
+            src={userI.avatarUrl}
+            onError={(e) =>
+              ((e.target as any).src = "/images/icon/icon-user-man.jpg")
+            }
             width={40}
             height={40}
-            src="/images/icon/icon-user-man.jpg"
             alt="User"
-            className="rounded-full"
           />
         </div>
       )}
