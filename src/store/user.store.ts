@@ -247,7 +247,7 @@ export const useUser = () => {
 
   const getUser = () => {
     const user = getFromLocalStorage("user_bmi_sistem");
-    return user
+    const data = user
       ? (user as {
           id: string;
           username: string;
@@ -260,6 +260,9 @@ export const useUser = () => {
           userId: string;
         })
       : null;
+    if (data)
+      data.avatarUrl = data ? data.avatarUrl.split("&export=download")[0] : "";
+    return data;
   };
 
   return {
