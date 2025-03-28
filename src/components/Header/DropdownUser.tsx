@@ -40,6 +40,7 @@ const DropdownUser = () => {
               width={125}
               height={125}
               alt="User"
+              className="rounded-full object-cover"
             />
           )}
         </span>

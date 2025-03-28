@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import { atomWithReducer } from "jotai/utils";
 import { useAuth } from "./auth.store";
 import { getFromLocalStorage, saveToLocalStorage } from "@/utils/utils";
+import axios from "axios";
 
 // Tipe untuk data dan state User
 interface UserState {
@@ -260,10 +261,12 @@ export const useUser = () => {
           summary: string;
           avatarUrl: string;
           userId: string;
+          avatarFileId: string;
         })
       : null;
-    if (data)
-      data.avatarUrl = data ? data.avatarUrl.split("&export=download")[0] : "";
+    if (data) {
+      data.avatarUrl = "/api/proxy?id=" + data.avatarFileId;
+    }
     return data;
   };
 

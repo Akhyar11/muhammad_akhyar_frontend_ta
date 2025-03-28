@@ -81,13 +81,24 @@ export default function useUser() {
 
   const getUser = () => {
     const user = getFromLocalStorage("user_bmi_sistem");
-    return user as {
-      id: string;
-      username: string;
-      token: string;
-      jk: boolean;
-      tgl_lahir: string;
-    };
+    const data = user
+      ? (user as {
+          id: string;
+          username: string;
+          token: string;
+          jk: boolean;
+          tgl_lahir: string;
+          nama_lengkap: string;
+          summary: string;
+          avatarUrl: string;
+          userId: string;
+          avatarFileId: string;
+        })
+      : null;
+    if (data) {
+      data.avatarUrl = "/api/proxy?id=" + data.avatarFileId;
+    }
+    return data;
   };
 
   return {
