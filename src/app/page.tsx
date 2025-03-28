@@ -3,9 +3,9 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import DashboardComponent from "@/components/Dashboard";
 
 export const metadata: Metadata = {
-  title:
-    "BMI Sistem - Dashboard",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
+  title: "BMI Sistem - Dashboard",
+  description:
+    "BMI System - Your Body Mass Index Calculator and Health Monitoring Dashboard",
 };
 
 export default function Home() {

@@ -4,7 +4,7 @@ import RiwayatComponent from "@/components/Riwayat";
 
 export const metadata: Metadata = {
   title: "BMI Sistem - Riwayat",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
+  description: "BMI System - History page for tracking your BMI calculations",
 };
 
 export default function Page() {
