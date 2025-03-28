@@ -136,14 +136,14 @@ export const useUser = () => {
       const errorMessage = error.response?.data.message;
       if (errorMessage === "not login, please login") {
         resetAllStateAndCookieAuth();
-      }
-      if (
-        !(
-          window.location.href.includes("/auth/login") ||
-          window.location.href.includes("/auth/register")
-        )
-      ) {
-        window.location.href = "/auth/login";
+        if (
+          !(
+            window.location.href.includes("/auth/login") ||
+            window.location.href.includes("/auth/register")
+          )
+        ) {
+          window.location.href = "/auth/login";
+        }
       }
     } finally {
       setLoading("read", false);
