@@ -50,6 +50,7 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
               width={40}
               height={40}
               alt="User"
+              className="rounded-full"
             />
           )}
         </div>

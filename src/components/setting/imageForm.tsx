@@ -110,6 +110,7 @@ function ImageFormComp() {
                 width={55}
                 height={55}
                 alt="User"
+                className="rounded-full"
               />
             )}
           </div>
