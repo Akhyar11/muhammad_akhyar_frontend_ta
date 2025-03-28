@@ -265,7 +265,11 @@ export const useUser = () => {
         })
       : null;
     if (data) {
-      data.avatarUrl = "/api/proxy?id=" + data.avatarFileId;
+      if (data.avatarFileId && data.avatarFileId !== "") {
+        data.avatarUrl = "/api/proxy?id=" + data.avatarFileId;
+      } else {
+        data.avatarUrl = "/images/icon/icon-user-man.jpg";
+      }
     }
     return data;
   };
