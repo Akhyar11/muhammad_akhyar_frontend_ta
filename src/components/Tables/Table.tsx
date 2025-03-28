@@ -77,7 +77,7 @@ const Table = ({
       {children}
 
       {/* Responsive Table */}
-      <div className="overflow-x-auto">
+      <div className="w-full overflow-x-auto">
         <table className="w-full min-w-full">
           {/* Desktop/Mobile Header */}
           <thead className="bg-gray-100 text-left font-semibold uppercase text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
