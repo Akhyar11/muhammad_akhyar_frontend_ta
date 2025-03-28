@@ -44,6 +44,9 @@ const Chat = ({ message, user }: { message: string; user: "user" | "AI" }) => {
               onError={(e) =>
                 ((e.target as any).src = "/images/icon/icon-user-man.jpg")
               }
+              onLoad={(e) => {
+                (e.target as any).src = "/images/loading-image.svg";
+              }}
               width={40}
               height={40}
               alt="User"

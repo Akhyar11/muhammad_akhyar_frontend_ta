@@ -104,6 +104,9 @@ function ImageFormComp() {
                 onError={(e) =>
                   ((e.target as any).src = "/images/icon/icon-user-man.jpg")
                 }
+                onLoad={(e) => {
+                  (e.target as any).src = "/images/loading-image.svg";
+                }}
                 width={55}
                 height={55}
                 alt="User"

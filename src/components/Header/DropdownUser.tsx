@@ -37,6 +37,9 @@ const DropdownUser = () => {
               onError={(e) =>
                 ((e.target as any).src = "/images/icon/icon-user-man.jpg")
               }
+              onLoad={(e) => {
+                (e.target as any).src = "/images/loading-image.svg";
+              }}
               width={125}
               height={125}
               alt="User"
